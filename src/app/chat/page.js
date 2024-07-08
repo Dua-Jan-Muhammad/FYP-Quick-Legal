@@ -18,12 +18,19 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MicIcon from "@mui/icons-material/Mic";
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite';
 
 import ChatIcon from "@mui/icons-material/Chat";
 import GavelIcon from "@mui/icons-material/Gavel";
 import InfoIcon from "@mui/icons-material/Info";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+
+import AudioMessage from "../UI/audioMessage";
+
+import { motion } from 'framer-motion';
 
 const hideScrollbarStyle = {
     msOverflowStyle: 'none', // Internet Explorer 10+
@@ -47,6 +54,18 @@ function page() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [audioURL, setAudioURL] = useState('');
+  const [recordingTime, setRecordingTime] = useState(0);
+
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+
+
+ 
+
+
   const handleInputKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -58,15 +77,16 @@ function page() {
     setChatStart(true);
     setInput("");
 
-    const newMessage = { text: input, sender: "user" };
+    const newMessage = { content: input, sender: "user" , type: "text" };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
 
     setTimeout(() => {
       setLoading(false);
       const botResponse = {
-        text: "This is a static response from the chatbot.",
+        content: "This is a static response from the chatbot.",
         sender: "bot",
+        type: "text",
       };
       setMessages((prevMessages) => [...prevMessages, botResponse]);
     }, 2000);
@@ -80,6 +100,95 @@ function page() {
 
  
   };
+
+
+  const handleStartRecording = async () => {
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start( );
+      setIsRecording(true);
+
+      const audioChunks = [];
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        setChatStart(true);
+        const audioBlob = new Blob(audioChunks);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { content: audioUrl , sender: "user" , type: 'audio'},
+        ]);
+        
+        setLoading(true);
+        setRecordingTime(0)
+
+
+        setTimeout(() => {
+            setLoading(false);
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {content: 'This is a simulated response from the chatbot.', sender: 'bot', type: 'text'},
+            ]);
+          }, 2000);
+      };
+
+      
+    } catch (error) {
+      console.error('Error accessing audio stream:', error);
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const pauseRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const resumeRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+    }
+  };
+
+  const handleCancelRecording = () => {
+    setIsRecording(false);
+    setIsPaused(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+    chunksRef.current = [];
+  };
+
+  useEffect(() => {
+    let timer;
+    if (isRecording && !isPaused) {
+      timer = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isRecording, isPaused]);
+
+
   return (
     <>
       <Box>
@@ -87,7 +196,7 @@ function page() {
           {ChatStart ? (
             <>
               <Box
-                height="84vh"
+                height="76vh"
                 id="Scrollbar"
                 sx={{
                   width: "100%",
@@ -113,7 +222,14 @@ function page() {
                           textAlign: message.sender === 'user' ? 'right' : 'left',
                         }}
                         primary={message.sender}
-                        secondary={message.text}
+                        secondary={message.type === 'text' ? message.content : (
+
+                            <AudioMessage audioURL={message.content} />
+                            // <audio controls>
+                            //   <source src={message.content} type="audio/ogg" />
+                            //   Your browser does not support the audio element.
+                            // </audio>
+                          )}
                         
                       />
                     </ListItem>
@@ -162,6 +278,7 @@ function page() {
                           flexDirection: "column",
                           justifyContent: "space-between",
                         }}
+                        onClick={()=>setInput(card.text)}
                       >
                         <CardContent>
                           <Typography variant="body1" gutterBottom>
@@ -223,13 +340,41 @@ function page() {
              
              
             />
-            <IconButton onClick={HandleChat}>
-              <SendIcon />
-            </IconButton>
-            <IconButton>
+
+            {
+                isRecording ? (
+                    <>
+                    {isPaused ? (<>
+                    <IconButton onClick={resumeRecording} >
+                    <PlayCircleFilledWhiteIcon />
+                    </IconButton> 
+                    </>):(<>
+                    <IconButton onClick={pauseRecording} color="error">
+                    <PauseCircleIcon />
+                    </IconButton>
+                    </>)}
+                    
+                    <Typography variant="body2">{`Recording: ${Math.floor(recordingTime / 60)}:${recordingTime % 60}`}</Typography>
+                    <IconButton onClick={handleStopRecording} color="error">
+                    <StopCircleIcon />
+                    </IconButton>
+                    </>
+                ) : (
+                    <IconButton onClick={HandleChat}>
+                    <SendIcon />
+                  </IconButton>
+      
+                )
+            }
+           
+
+            <IconButton onClick={handleStartRecording}
+          >
               <MicIcon />
             </IconButton>
           </Box>
+         
+      
         </Container>
       </Box>
     </>

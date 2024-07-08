@@ -22,9 +22,9 @@ import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Link from "next/link";
-import Image from "next/image";
-import avatar from "../../../public/avatar_image.png"
+
+
+// import avatar from "../../../public/avatar.mp4";
 
 import { useRouter } from "next/navigation";
 
@@ -244,12 +244,34 @@ const DashboardLayout = ({ children }) => {
             mx: 2,
           }}
         >
-          <Image
+          {/* <Image
             src={avatar}
             
             width={220}
             alt="Picture of the avatar"
-          />
+          /> */}
+
+          
+
+          <video
+            width="220"
+            height="400"
+            autoPlay
+            muted
+            controls
+            loop
+            preload="none"
+          >
+            <source
+              src="https://www.dropbox.com/scl/fi/wryepv01pgk3dnir0ax1o/avatar.mp4?rlkey=rhft6dxl26hsmktkxqhddihjk&st=6g4ba98k&raw=1"
+              type="video/mp4"
+              kind="subtitles"
+              srcLang="en"
+            />
+            <track src="https://www.dropbox.com/scl/fi/wryepv01pgk3dnir0ax1o/avatar.mp4?rlkey=rhft6dxl26hsmktkxqhddihjk&st=6g4ba98k&raw=1"
+             srcLang="en" label="English" />
+            Your browser does not support the video tag.
+          </video>
         </Box>
       </Drawer>
     </Box>
