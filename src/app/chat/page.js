@@ -28,6 +28,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useState, useRef, useEffect } from "react";
 
+
 import AudioMessage from "../UI/audioMessage";
 
 import { motion } from 'framer-motion';
@@ -40,7 +41,7 @@ const hideScrollbarStyle = {
     },
   };
 
-function page() {
+function ChatPage() {
   const cardData = [
     { text: "Get legal advice on property disputes", icon: <GavelIcon /> },
     { text: "Understand your rights as a tenant", icon: <InfoIcon /> },
@@ -381,4 +382,4 @@ function page() {
   );
 }
 
-export default page;
+export default ChatPage;
