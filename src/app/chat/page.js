@@ -14,7 +14,12 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Skeleton
+  Skeleton,
+  Alert,
+  Collapse,
+  Button, 
+  CloseIcon
+
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import MicIcon from "@mui/icons-material/Mic";
@@ -27,6 +32,9 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import InfoIcon from "@mui/icons-material/Info";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useState, useRef, useEffect } from "react";
+
+import axios from "axios";
+
 
 
 import AudioMessage from "../UI/audioMessage";
@@ -59,6 +67,7 @@ function ChatPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [audioURL, setAudioURL] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
+  const [errorMessage, setErrorMessage] = useState(0)
 
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
@@ -76,21 +85,35 @@ function ChatPage() {
 
   const HandleChat = () => {
     setChatStart(true);
-    setInput("");
+    
 
     const newMessage = { content: input, sender: "user" , type: "text" };
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
+    const apiPrompt = {prompt: input, k:2}
+    setInput("");
+
+    axios.post('https://6f88-18-233-165-131.ngrok-free.app/rag_chatbot/', apiPrompt)
+    .then((response) => {
+      
+      console.log(response.data)
+      
       const botResponse = {
-        content: "This is a static response from the chatbot.",
+        content: response.data.response,
         sender: "bot",
         type: "text",
       };
+      
       setMessages((prevMessages) => [...prevMessages, botResponse]);
-    }, 2000);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error('Error fetching bot response:', error);
+      setLoading(false);
+      setErrorMessage(error.message)
+      
+    });
 
 
 
@@ -194,6 +217,29 @@ function ChatPage() {
     <>
       <Box>
         <Container maxWidth="md" sx={{ flexGrow: 1, overflow: "auto", py: 2 }}>
+          {/* {errorMessage&& <>
+            <Collapse in={open}>
+        <Alert
+        severity="error"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+            {errorMessage}
+        </Alert>
+      </Collapse>
+          
+          </>} */}
           {ChatStart ? (
             <>
               <Box
