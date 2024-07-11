@@ -32,6 +32,7 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import InfoIcon from "@mui/icons-material/Info";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import { useState, useRef, useEffect } from "react";
+import DisplayText from "../UI/TextFormatting"
 
 import axios from "axios";
 
@@ -97,7 +98,7 @@ function ChatPage() {
     axios.post('https://6f88-18-233-165-131.ngrok-free.app/rag_chatbot/', apiPrompt)
     .then((response) => {
       
-      console.log(response.data)
+      console.log(response.data.response)
       
       const botResponse = {
         content: response.data.response,
@@ -269,7 +270,12 @@ function ChatPage() {
                           textAlign: message.sender === 'user' ? 'right' : 'left',
                         }}
                         primary={message.sender}
-                        secondary={message.type === 'text' ? message.content : (
+                        secondary={message.type === 'text' ? <>
+                        <DisplayText text={message.content} />
+                        
+                        </>
+                          
+                           : (
 
                             <AudioMessage audioURL={message.content} />
                             // <audio controls>
