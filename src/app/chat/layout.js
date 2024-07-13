@@ -160,7 +160,11 @@ const DashboardLayout = ({ children }) => {
                 backgroundColor: "#dde3ea",
                 color: "#444739",
                 padding: "10px",
+                '&:hover': {
+                  backgroundColor: '#eeeeee', // Change this to your desired hover color
+                },
               }}
+              
             >
               New Chat
             </Button>

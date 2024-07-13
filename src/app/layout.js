@@ -1,5 +1,5 @@
 import { Outfit } from "next/font/google";
-import "./globals.css";
+// import "./globals.css";
 
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';

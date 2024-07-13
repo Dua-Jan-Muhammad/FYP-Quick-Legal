@@ -7,9 +7,7 @@ const theme = createTheme({
 
     palette: {
         mode: 'light',  
-        primary: {
-          main: '#eeeeee',
-        },
+        
         
       },
 
