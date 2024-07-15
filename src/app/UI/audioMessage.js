@@ -22,7 +22,7 @@ const AudioMessage = ({ audioURL }) => {
 
   return (
     <>
-      <Box display="flex" alignItems="center" mt={1} sx={{
+      <Box component="span"  display="flex" alignItems="center" mt={1} sx={{
         backgroundColor: "#F0F4F9",
         borderRadius: 5,
         paddingTop: 1,

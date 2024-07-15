@@ -9,7 +9,7 @@ const parseText = (text) => {
     // Split each paragraph by single newline characters
     const lines = paragraph.split('\n');
     return (
-      <Typography key={index} component="span" variant="body2" display="block"  paragraph>
+      <Typography key={index} component="span" variant="body2" display="block" >
         {lines.map((line, idx) => (
           <React.Fragment key={idx}>
             {line}
@@ -22,9 +22,7 @@ const parseText = (text) => {
 };
 
 const DisplayText = ({ text }) => {
-  return <ListItemText
-  secondary={<>{parseText(text)}</>}
-/>;
+  return <>{parseText(text)}</>
 };
 
 export default DisplayText;

@@ -93,9 +93,10 @@ function ChatPage() {
     setLoading(true);
 
     const apiPrompt = {prompt: input, k:2}
+    console.log(apiPrompt)
     setInput("");
 
-    axios.post('https://6f88-18-233-165-131.ngrok-free.app/rag_chatbot/', apiPrompt)
+    axios.post('https://6f88-18-233-165-131.ngrok-free.app/text_to_response/', apiPrompt)
     .then((response) => {
       
       console.log(response.data.response)
@@ -144,6 +145,7 @@ function ChatPage() {
       mediaRecorder.onstop = () => {
         setChatStart(true);
         const audioBlob = new Blob(audioChunks);
+        
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioURL(audioUrl);
         setMessages((prevMessages) => [
@@ -151,17 +153,41 @@ function ChatPage() {
           { content: audioUrl , sender: "user" , type: 'audio'},
         ]);
         
+        const audioFile = new Blob(audioChunks, { type: 'audio/wav' }); // Create a Blob with audio/wav MIME type
+        const formData = new FormData();
+        formData.append('file', audioFile);
+        console.log([...formData])
+
         setLoading(true);
         setRecordingTime(0)
 
+        axios.post('https://6f88-18-233-165-131.ngrok-free.app/audio_to_response/?k=2', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }).then((response) => {
+          
+          const botResponse = {
+            content: response.data.response,
+            sender: "bot",
+            type: "text",
+          };
+          setMessages((prevMessages) => [...prevMessages, botResponse]);
+          setLoading(false);
+        }).catch((error) => {
+          console.error('Error fetching bot response:', error);
+          setLoading(false);
+          setErrorMessage(error.message)
+        });
 
-        setTimeout(() => {
-            setLoading(false);
-            setMessages((prevMessages) => [
-              ...prevMessages,
-              {content: 'This is a simulated response from the chatbot.', sender: 'bot', type: 'text'},
-            ]);
-          }, 2000);
+
+        // setTimeout(() => {
+        //     setLoading(false);
+        //     setMessages((prevMessages) => [
+        //       ...prevMessages,
+        //       {content: 'This is a simulated response from the chatbot.', sender: 'bot', type: 'text'},
+        //     ]);
+        //   }, 2000);
       };
 
       
@@ -278,10 +304,7 @@ function ChatPage() {
                            : (
 
                             <AudioMessage audioURL={message.content} />
-                            // <audio controls>
-                            //   <source src={message.content} type="audio/ogg" />
-                            //   Your browser does not support the audio element.
-                            // </audio>
+                           
                           )}
                         
                       />
@@ -409,7 +432,7 @@ function ChatPage() {
                     
                     <Typography variant="body2">{`Recording: ${Math.floor(recordingTime / 60)}:${recordingTime % 60}`}</Typography>
                     <IconButton onClick={handleStopRecording} color="error">
-                    <StopCircleIcon />
+                    <SendIcon />
                     </IconButton>
                     </>
                 ) : (
