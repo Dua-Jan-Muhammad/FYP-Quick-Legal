@@ -29,7 +29,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useRouter } from "next/navigation";
 
 const drawerWidth = 250;
-const drawerWidth2 = 280;
+
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -221,63 +221,6 @@ const DashboardLayout = ({ children }) => {
         {children}
       </Box>
 
-      <Drawer
-        anchor="right"
-        variant="permanent"
-        open={openRight}
-        PaperProps={{ sx: { backgroundColor: "#F0F4F9", border: "none" } }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: [1],
-          }}
-        >
-          <IconButton onClick={toggleDrawer2}>
-            <ChevronRightIcon />
-          </IconButton>
-        </Toolbar>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            height: "90vh",
-            mx: 2,
-          }}
-        >
-          {/* <Image
-            src={avatar}
-            
-            width={220}
-            alt="Picture of the avatar"
-          /> */}
-
-          
-
-          <video
-            width="220"
-            height="400"
-            autoPlay
-            muted
-            controls
-            loop
-            preload="none"
-          >
-            <source
-              src="https://www.dropbox.com/scl/fi/wryepv01pgk3dnir0ax1o/avatar.mp4?rlkey=rhft6dxl26hsmktkxqhddihjk&st=6g4ba98k&raw=1"
-              type="video/mp4"
-              kind="subtitles"
-              srcLang="en"
-            />
-            <track src="https://www.dropbox.com/scl/fi/wryepv01pgk3dnir0ax1o/avatar.mp4?rlkey=rhft6dxl26hsmktkxqhddihjk&st=6g4ba98k&raw=1"
-             srcLang="en" label="English" />
-            Your browser does not support the video tag.
-          </video>
-        </Box>
-      </Drawer>
     </Box>
   );
 };

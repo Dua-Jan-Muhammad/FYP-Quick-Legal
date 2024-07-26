@@ -7,8 +7,8 @@ import theme from './theme';
 const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "EzQanoon Chatbot",
-  description: "Your Legal Assistant",
+  title: "Quick Legal",
+  description: "Your Legal Assistant Chatbot (FYP project made by students of SMIU)",
 };
 
 export default function RootLayout({ children }) {
